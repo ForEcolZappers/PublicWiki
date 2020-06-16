@@ -7,12 +7,19 @@ To run this mini session you will need to install git which can be done from [th
 Included here are the slides used to run the class as well as to send out afterwards with a little more detail. Included below are just a handful of resources on git, but there is plent out there if you wish to read further:
 
 [Git Cheat Sheet](https://github.github.com/training-kit/downloads/github-git-cheat-sheet.pdf)
+
 [Pro Git (THE Git Book) - Free](https://git-scm.com/book/en/v2)
+
 [CRUK intro to Github Workshop](https://kirstiejane.github.io/friendly-github-intro/)
+
 [Github Reading and Practice](https://try.github.io/)
+
 [Code Academy Git Course (~2hr)](https://www.codecademy.com/learn/learn-git)
+
 [UIS Day Course in Git (free)](https://training.cam.ac.uk/ucs/event/1948859)
+
 [Github Education Pack (Free)](https://education.github.com/)
+
 [Learn Git Branching (More Advanced)](https://learngitbranching.js.org/)
 
 Feel free to share these resources and materials with anyone you think might benefit, I'm also happy to be contacted about working with git if you have questions. Enjoy a more strreamlined way to track and share your research code!
