@@ -1,0 +1,14 @@
+# Introduction to the tidyverse
+Author: James Ball
+Date: 27-Jul-2020
+
+Requirements:
+- R/RStudio
+- Packages: `tidyr`, `dplyr` `ggplot2`
+- Data: `nycflights13`, `dcl-docs/dcldata`
+
+[Presentation](https://docs.google.com/presentation/d/14bcN9bWheksshU8gg4jftRzVvfUXVGMKF3Vea3WS-18/edit?usp=sharing)
+
+[Tutorial 1](https://htmlpreview.github.io/?https://github.com/ForEcolZappers/PublicWiki/blob/master/tidyverse_class/dplyr_tutorial.html)
+
+[Tutorial 2](https://htmlpreview.github.io/?https://github.com/ForEcolZappers/PublicWiki/blob/master/tidyverse_class/tidyverse_tutorial.html)
