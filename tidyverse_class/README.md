@@ -2,6 +2,7 @@
 title: Introduction to the tidyverse
 author: James Ball
 Date: 27-Jul-2020
+---
 
 # Introduction to the tidyverse
 
