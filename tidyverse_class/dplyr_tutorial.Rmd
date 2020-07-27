@@ -14,9 +14,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ## dplyr basics
 
 First we'll look at three key `dplyr` functions for basic data manipulation:
+
 - Pick observations by their values with `filter()`
 - Create new variables with functions of existing variables with `mutate()`.
 - Collapse many values down to a single summary `summarize()`.
+
 These can all be used in conjunction with `group_by()` which changes the scope of each function from operating on the entire dataset to operating on it group-by-group.
 
 All `dplyr` verbs work similarly:
@@ -42,7 +44,7 @@ Take a look at the data
 head(flights)
 ```
 
-Can you use `filter()` to inspect flights from the first day of the year? (hint: use `month == ` and `day == `)?
+Q1/ Can you use `filter()` to inspect flights from the first day of the year? (hint: use `month == ` and `day == `)?
 (Use a pipe to pass the data into the filter function)
 ```{r month, echo=FALSE}
 flights %>% 
@@ -91,7 +93,7 @@ flights_sml %>%
 
 Here we have created the variable `gain` which tells us the difference between the arrival delay and the departure delay.
 
-How would you create a new variable that tells us the average speed during the flight (`speed`)
+Q / How would you create a new variable that tells us the average speed during the flight (`speed`)
 
 ```{r speed, echo=FALSE}
 flights_sml %>% 
@@ -177,3 +179,5 @@ flights %>%
   geom_point(aes(size = count), alpha = 1/3) +
   geom_smooth(se = FALSE)
 ```
+
+See [Data Challenge Lab](https://dcl-wrangle.stanford.edu/) for solutions.

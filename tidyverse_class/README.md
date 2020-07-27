@@ -6,7 +6,7 @@ Date: 27-Jul-2020
 
 # Introduction to the tidyverse
 
-This session is based on [Data Challenge Lab](https://dcl-wrangle.stanford.edu/) material.
+This session is adapted from [Data Challenge Lab](https://dcl-wrangle.stanford.edu/) material.
 
 Requirements:
 

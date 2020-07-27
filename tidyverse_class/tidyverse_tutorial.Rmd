@@ -80,9 +80,9 @@ example_eagle_nests %>%
   )
 ```
 
-`pivot_longer()` also has a values_ptypes argument that controls the type of the values_to column. You specify `values_ptypes` in the same way as `names_ptypes`.
+`pivot_longer()` also has a values_ptypes argument that controls the type of the values_to column. `values_ptypes` is specified in the same way as `names_ptypes`.
 
-Q4/ Using `pivot_longer()`, hOw would we change `num_nests` from its default type (double) to an integer?
+Q4/ Using `pivot_longer()`, how would we change `num_nests` from its default type (double) to an integer?
 
 ```{r values, echo=FALSE}
 example_eagle_nests %>% 
@@ -97,7 +97,7 @@ example_eagle_nests %>%
 ```
 
 
-Now, can you return the tidy Tibble to its original form using `pivot_wider()`?
+Q5/ Now, can you return the tidy Tibble to its original form using `pivot_wider()`?
 
 
 ```{r privot_wider, echo=FALSE}
@@ -115,8 +115,9 @@ Now we will look at data of gymnatics scores from the 2012 and 2016 Olympics.
 ```{r gymdata}
 example_gymnastics_2
 ```
-Is this data tidy?
-What variables can you identify? (there should be four)
+Q6/ a/ Is this data tidy?
+
+b/ What variables can you identify? (there should be four)
 
 We can use `pivot_longer()` as before to create a dataframe with `country`, `event_year` and `score` columns.
 ```{r gymlong}
