@@ -1,0 +1,179 @@
+---
+title: "dplyr tutorial"
+author: "James Ball"
+date: "27/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# dplyr intro
+
+## dplyr basics
+
+First we'll look at three key `dplyr` functions for basic data manipulation:
+- Pick observations by their values with `filter()`
+- Create new variables with functions of existing variables with `mutate()`.
+- Collapse many values down to a single summary `summarize()`.
+These can all be used in conjunction with `group_by()` which changes the scope of each function from operating on the entire dataset to operating on it group-by-group.
+
+All `dplyr` verbs work similarly:
+
+1. The first argument is a data frame
+2. The subsequent arguments describe what to do with the data frame
+3. The result is a new data frame
+
+See the [data transformation cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-transformation.pdf) for help.
+
+we will use the `dplyr` package and example data from `nycflights13`
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+#install.packages("nycflights13")
+library(nycflights13)
+```
+
+Take a look at the data
+
+```{r data}
+head(flights)
+```
+
+Can you use `filter()` to inspect flights from the first day of the year? (hint: use `month == ` and `day == `)?
+(Use a pipe to pass the data into the filter function)
+```{r month, echo=FALSE}
+flights %>% 
+  filter(month == 1, day == 1)
+```
+
+
+To filter the flights for November and December, you can use the `|` ("or") logical operator
+
+```{r or}
+flights %>% 
+  filter(month == 11 | month == 12)
+```
+
+Alternatively, it can be useful to use the `%in%` operator
+
+```{r in}
+flights %>% 
+  filter(month %in% c(11, 12))
+```
+
+## New variables with `mutate()`
+
+To create a more managable Tibble we will use the `select()` function to choose the variables that are of interest to us. Note the use of `ends_withs()` to select multiple relevant variables.
+
+```{r select}
+flights_sml <- 
+  flights %>% 
+  select( 
+    year:day, 
+    ends_with("delay"), 
+    distance, 
+    air_time
+  )
+flights_sml
+```
+
+Now we would like to create some new variables
+
+```{r gain}
+flights_sml %>% 
+  mutate(
+    gain = arr_delay - dep_delay
+  )
+```
+
+Here we have created the variable `gain` which tells us the difference between the arrival delay and the departure delay.
+
+How would you create a new variable that tells us the average speed during the flight (`speed`)
+
+```{r speed, echo=FALSE}
+flights_sml %>% 
+  mutate(
+    gain = arr_delay - dep_delay,
+    speed = distance / air_time * 60
+  )
+```
+
+## Grouped summaries
+
+The verb `summarize()` colamples a data frame to a single row. For examples, we can use it to calculate the average delay.
+
+```{r delay}
+flights %>% 
+  summarize(delay = mean(dep_delay, na.rm = TRUE))
+```
+
+We can combine it with `group_by()` which changes the unit of analysis from the complete dataset to individual groups.
+
+How would you create a data frame that tells you the average delay in each month? (hint: use two pipe operations)
+
+```{r delaymonth, echo=FALSE}
+flights %>% 
+  group_by(year, month) %>% 
+  summarize(delay = mean(dep_delay, na.rm = TRUE))
+```
+
+## Extension exercise
+
+Imagine that we want to explore the relationship between the distance and average delay for each location.
+
+To prepare this data we can:
+
+1. Use `group_by()` to group flights by destination.
+
+2. Use `summarize()` to count the flights for each destination and calculate the mean distance and arrival delay e.g.
+```
+summarize(
+  by_dest,
+  count = n(),
+  dist = mean(distance, na.rm = TRUE),
+  delay = mean(arr_delay, na.rm = TRUE)
+)
+```
+
+3. Filter to remove noisy points and Honolulu airport, which is almost twice as far away as the next closest airport.
+```
+delay <- filter(delay, count > 20, dest != "HNL")
+```
+
+We can then use ggplot to display these results.
+
+How can we combine these operations using pipes (`%>%`)?
+
+
+```{r plot, echo=FALSE, message=FALSE}
+delays <- 
+  flights %>% 
+  group_by(dest) %>% 
+  summarize(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  filter(count > 20, dest != "HNL")
+ggplot(data = delays, mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```
+
+
+```{r plot2, echo=FALSE, eval=FALSE}
+flights %>% 
+  group_by(dest) %>% 
+  summarize(
+    count = n(),
+    dist = mean(distance, na.rm = TRUE),
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  filter(count > 20, dest != "HNL") %>%
+  ggplot(mapping = aes(x = dist, y = delay)) +
+  geom_point(aes(size = count), alpha = 1/3) +
+  geom_smooth(se = FALSE)
+```

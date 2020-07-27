@@ -1,0 +1,151 @@
+---
+title: "tidyverse tutorial"
+author: "James Ball"
+date: "26/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tidy data and data wrangling
+
+We will need the `tidyr`, `dplyr` and `readr` packages. We will use example data
+from the `dcldata` package.
+
+```{r packages, warning=FALSE, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(readr)
+#devtools::install_github("dcl-docs/dcldata")
+library(dcldata) # for the example datasets
+```
+
+## Pivoting
+
+We will be using `tidyr`'s the `pivot_longer` and `pivot_wider` functions rather
+than the outdated `spread` and `gather`.
+
+We will be using the `example_eagle_nests` dataset which is loaded as a Tibble.
+
+```{r data}
+example_eagle_nests
+```
+
+Q1/
+Is this data tidy? Give reasons
+
+Q2/
+Go through these steps, and use the `pivot_longer` function and a pipe to define
+a tidy version of the dataset:
+
+1. What are the variables?
+2. Which columns should we pivot?
+3. Which columns contain the values?
+4. Name the column that will store the column values.
+
+
+```{r pivot_long, eval=FALSE}
+example_eagle_nests_tidy <-   
+  example_eagle_nests %>% 
+    pivot_longer(
+      # Step 2
+      # Step 3
+      # Step 4
+    )
+```
+```{r pivot_long_run, echo=FALSE}
+example_eagle_nests_tidy <-
+  example_eagle_nests %>% 
+    pivot_longer(
+      cols = c(`2007`, `2009`), 
+      names_to = "year", 
+      values_to = "num_nests"
+  )
+example_eagle_nests_tidy
+```
+
+`year` is returned as character column.
+
+Q3/ Can you use the `names_ptypes` arguement to return it as a more useful vector type?
+
+```{r names, echo=FALSE}
+example_eagle_nests %>% 
+  pivot_longer(
+    cols = c(`2007`, `2009`), 
+    names_to = "year", 
+    names_ptypes = list(year = integer()),
+    values_to = "num_nests"
+  )
+```
+
+`pivot_longer()` also has a values_ptypes argument that controls the type of the values_to column. You specify `values_ptypes` in the same way as `names_ptypes`.
+
+Q4/ Using `pivot_longer()`, hOw would we change `num_nests` from its default type (double) to an integer?
+
+```{r values, echo=FALSE}
+example_eagle_nests %>% 
+  pivot_longer(
+    cols = c(`2007`, `2009`), 
+    names_to = "year", 
+    names_ptypes = list(year = integer()),
+    values_to = "num_nests",
+    values_ptypes = list(num_nests = integer())
+  )
+
+```
+
+
+Now, can you return the tidy Tibble to its original form using `pivot_wider()`?
+
+
+```{r privot_wider, echo=FALSE}
+example_eagle_nests_tidy %>% 
+  pivot_wider(
+    names_from = year, 
+    values_from = num_nests
+  )
+```
+
+## Gymnastics data
+
+Now we will look at data of gymnatics scores from the 2012 and 2016 Olympics.
+
+```{r gymdata}
+example_gymnastics_2
+```
+Is this data tidy?
+What variables can you identify? (there should be four)
+
+We can use `pivot_longer()` as before to create a dataframe with `country`, `event_year` and `score` columns.
+```{r gymlong}
+example_gymnastics_2 %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = "event_year",
+    values_to = "score"
+  )
+```
+
+However, `event_year` contains two variables, so the result is not yet tidy. Instead we want a seperate `event` variable and `year` variable.
+
+Using `pivot_longer()`'s `names_sep` arguement, seperate these variables and make the `example_gymnatstics_2` tibble tidy!
+
+```{r gymtidy, echo=FALSE}
+example_gymnastics_2 %>% 
+  pivot_longer(
+    cols = -country,
+    names_to = c("event", "year"),
+    names_sep = "_",
+    values_to = "score"
+  )
+```
+
+
+## Extension exercise
+
+Can you make the `example_gymnastics_3` and `example_gymnamtics_4` datasets tidy?
+
+
+See [Data Challenge Lab](https://dcl-wrangle.stanford.edu/) for solutions.
