@@ -93,7 +93,7 @@ flights_sml %>%
 
 Here we have created the variable `gain` which tells us the difference between the arrival delay and the departure delay.
 
-Q / How would you create a new variable that tells us the average speed during the flight (`speed`)
+Q2/ How would you create a new variable that tells us the average speed during the flight (`speed`)
 
 ```{r speed, echo=FALSE}
 flights_sml %>% 
@@ -105,7 +105,7 @@ flights_sml %>%
 
 ## Grouped summaries
 
-The verb `summarize()` colamples a data frame to a single row. For examples, we can use it to calculate the average delay.
+The verb `summarize()` collapses a data frame to a single row. For examples, we can use it to calculate the average delay.
 
 ```{r delay}
 flights %>% 
