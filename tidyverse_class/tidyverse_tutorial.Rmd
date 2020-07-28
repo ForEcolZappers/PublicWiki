@@ -11,21 +11,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Tidy data and data wrangling
 
-We will need the `tidyr`, `dplyr` and `readr` packages. We will use example data
+We will need the `tidyr` and `dplyr` packages. We will use example data
 from the `dcldata` package.
 
 ```{r packages, warning=FALSE, message=FALSE}
 library(tidyr)
 library(dplyr)
-library(readr)
+#library(readr)
 #devtools::install_github("dcl-docs/dcldata")
 library(dcldata) # for the example datasets
 ```
 
 ## Pivoting
 
-We will be using `tidyr`'s the `pivot_longer` and `pivot_wider` functions rather
-than the outdated `spread` and `gather`.
+We will be using `tidyr`'s the `pivot_longer()` and `pivot_wider()` functions rather
+than the outdated and more difficult to us `spread()` and `gather()`.
 
 We will be using the `example_eagle_nests` dataset which is loaded as a Tibble.
 
@@ -131,7 +131,7 @@ example_gymnastics_2 %>%
 
 However, `event_year` contains two variables, so the result is not yet tidy. Instead we want a seperate `event` variable and `year` variable.
 
-Using `pivot_longer()`'s `names_sep` arguement, seperate these variables and make the `example_gymnatstics_2` tibble tidy!
+Q6/ Using `pivot_longer()`'s `names_sep` arguement, seperate these variables and make the `example_gymnatstics_2` tibble tidy!
 
 ```{r gymtidy, echo=FALSE}
 example_gymnastics_2 %>% 
