@@ -4,10 +4,11 @@ https://docs.google.com/document/d/1xk61EK3eyOAcplCuKVRDbj9dk52awN1hFaP1yzGRXc0/
 
 ## Classes
 
-* **tidyverse intro** *28/07/2020* [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/tidyverse_class)
-* **Linux/Bash** *20/07/2020*
-* **rmarkdown** *23/06/2020* 
-* **git** *20/06/2020* a version control software used to track and archive changes to files, very useful for managing research code and then sharing on servers. We had a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/Git) on how the basics of git and how to use it to track and publish code for an individual.
+* **tidyverse II** *11/08/2020* [TO BE COMPLETED BY SAM]
+* **tidyverse intro** *28/07/2020* The tidyverse is a collection of R packages designed to make data analysis easier, cleaner and more efficient [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/tidyverse_class)
+* **Linux/Bash** *20/07/2020* Bash and cluster computing can be invaluable for processing large amounts of data. Anne Thomas gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/bash_cluster_class) on the topic.
+* **rmarkdown** *23/06/2020* Rmarkdown is a useful tool for producing and publishing reproducable research. O'Neill Tun gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/Rmarkdown_class) on the basics. 
+* **git** *20/06/2020* a version control software used to track and archive changes to files, very useful for managing research code and then sharing on servers. Jonathan Williams gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/Git) on how the basics of git and how to use it to track and publish code for an individual.
 
 
 ## Code for Group Publications
