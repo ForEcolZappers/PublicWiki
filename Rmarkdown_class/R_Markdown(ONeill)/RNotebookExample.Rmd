@@ -1,0 +1,57 @@
+This report contains the analysis of the gapminder data and contains the results of the top Countries with the largest life expectancy in Europe.  The analysis is based on data from 2007.  The report also analyzes how love expectancy changed over the years in Europe.  
+
+This report was generated using R and the code to extract the European 2007 data is as follows:
+
+
+
+```{r intro-chunk, message=FALSE}
+#load tidyverse library
+library(tidyverse) # used for data manipulation
+library(rmarkdown) # used for paged_table function
+library(kableExtra) # used for table
+
+#read file into R
+pop_data <- read_csv("data/gapminder_data.csv")
+
+#create a table with data from European countries in 2007 showing the countries with the largest life expectancy at the top 
+euro_data_tbl <- pop_data %>% 
+                    filter(continent == "Europe" & year == 2007) %>% 
+                    select(-continent, -year) %>% 
+                    arrange(desc(lifeExp)) %>% 
+                    rename(Country = country, "Population Size" = pop, "Life Expectancy" = lifeExp, "GDP" = gdpPercap)
+                    
+```
+
+The results in euro_data_tbl are displayed in the Table below:
+
+```{r kable-chunk, echo=FALSE}
+euro_data_tbl %>% 
+          kable(caption="European countries ordered by greatest life expectancy from 2007 data") %>% 
+          kable_styling(bootstrap_options = "striped", full_width = F) %>% 
+          scroll_box(width = "100%", height = "200px")
+```
+
+A better way to display this table is with pagination as follows:
+
+```{r paged-table-chunk, echo=FALSE}
+paged_table(euro_data_tbl)
+```
+
+Next, the life expectacy in Europe is observed across different years.  The aim of this is to check if there was a change in life expectancy over the years.  The data used for the life expectancy over the years analysis is the gapminder data and the following data manipulation was performed:
+
+```{r fig-data-chunk}
+#keep on European data and change year to factor
+euro_data_fig <- pop_data %>% 
+                    filter(continent == "Europe")  %>% 
+                    mutate(year=as.factor(year))
+```
+
+The life expactency over the years is plotted as following:
+
+```{r fig-chunk, fig.cap="Life Expectancy in Europe over the years"}
+euro_data_fig %>%
+  ggplot(mapping=aes(x=year, y=lifeExp)) +
+    geom_violin()
+```
+
+

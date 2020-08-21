@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>RNotebookExample.utf8</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="RNotebookExample.html">RNotebook</a>
+</li>
+<li>
+  <a href="Project1.html">Project 1</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<p>This report contains the analysis of the gapminder data and contains the results of the top Countries with the largest life expectancy in Europe. The analysis is based on data from 2007. The report also analyzes how love expectancy changed over the years in Europe.</p>
+<p>This report was generated using R and the code to extract the European 2007 data is as follows:</p>
+<pre class="r"><code>#load tidyverse library
+library(tidyverse) # used for data manipulation
+library(rmarkdown) # used for paged_table function
+library(kableExtra) # used for table
+
+#read file into R
+pop_data &lt;- read_csv(&quot;data/gapminder_data.csv&quot;)
+
+#create a table with data from European countries in 2007 showing the countries with the largest life expectancy at the top 
+euro_data_tbl &lt;- pop_data %&gt;% 
+                    filter(continent == &quot;Europe&quot; &amp; year == 2007) %&gt;% 
+                    select(-continent, -year) %&gt;% 
+                    arrange(desc(lifeExp)) %&gt;% 
+                    rename(Country = country, &quot;Population Size&quot; = pop, &quot;Life Expectancy&quot; = lifeExp, &quot;GDP&quot; = gdpPercap)</code></pre>
+<p>The results in euro_data_tbl are displayed in the Table below:</p>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:100%; ">
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+European countries ordered by greatest life expectancy from 2007 data
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+Country
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Population Size
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+Life Expectancy
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+GDP
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Iceland
+</td>
+<td style="text-align:right;">
+301931
+</td>
+<td style="text-align:right;">
+81.757
+</td>
+<td style="text-align:right;">
+36180.789
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Switzerland
+</td>
+<td style="text-align:right;">
+7554661
+</td>
+<td style="text-align:right;">
+81.701
+</td>
+<td style="text-align:right;">
+37506.419
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Spain
+</td>
+<td style="text-align:right;">
+40448191
+</td>
+<td style="text-align:right;">
+80.941
+</td>
+<td style="text-align:right;">
+28821.064
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sweden
+</td>
+<td style="text-align:right;">
+9031088
+</td>
+<td style="text-align:right;">
+80.884
+</td>
+<td style="text-align:right;">
+33859.748
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+France
+</td>
+<td style="text-align:right;">
+61083916
+</td>
+<td style="text-align:right;">
+80.657
+</td>
+<td style="text-align:right;">
+30470.017
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Italy
+</td>
+<td style="text-align:right;">
+58147733
+</td>
+<td style="text-align:right;">
+80.546
+</td>
+<td style="text-align:right;">
+28569.720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Norway
+</td>
+<td style="text-align:right;">
+4627926
+</td>
+<td style="text-align:right;">
+80.196
+</td>
+<td style="text-align:right;">
+49357.190
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Austria
+</td>
+<td style="text-align:right;">
+8199783
+</td>
+<td style="text-align:right;">
+79.829
+</td>
+<td style="text-align:right;">
+36126.493
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Netherlands
+</td>
+<td style="text-align:right;">
+16570613
+</td>
+<td style="text-align:right;">
+79.762
+</td>
+<td style="text-align:right;">
+36797.933
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Greece
+</td>
+<td style="text-align:right;">
+10706290
+</td>
+<td style="text-align:right;">
+79.483
+</td>
+<td style="text-align:right;">
+27538.412
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Belgium
+</td>
+<td style="text-align:right;">
+10392226
+</td>
+<td style="text-align:right;">
+79.441
+</td>
+<td style="text-align:right;">
+33692.605
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+United Kingdom
+</td>
+<td style="text-align:right;">
+60776238
+</td>
+<td style="text-align:right;">
+79.425
+</td>
+<td style="text-align:right;">
+33203.261
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Germany
+</td>
+<td style="text-align:right;">
+82400996
+</td>
+<td style="text-align:right;">
+79.406
+</td>
+<td style="text-align:right;">
+32170.374
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Finland
+</td>
+<td style="text-align:right;">
+5238460
+</td>
+<td style="text-align:right;">
+79.313
+</td>
+<td style="text-align:right;">
+33207.084
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ireland
+</td>
+<td style="text-align:right;">
+4109086
+</td>
+<td style="text-align:right;">
+78.885
+</td>
+<td style="text-align:right;">
+40675.996
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Denmark
+</td>
+<td style="text-align:right;">
+5468120
+</td>
+<td style="text-align:right;">
+78.332
+</td>
+<td style="text-align:right;">
+35278.419
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Portugal
+</td>
+<td style="text-align:right;">
+10642836
+</td>
+<td style="text-align:right;">
+78.098
+</td>
+<td style="text-align:right;">
+20509.648
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Slovenia
+</td>
+<td style="text-align:right;">
+2009245
+</td>
+<td style="text-align:right;">
+77.926
+</td>
+<td style="text-align:right;">
+25768.258
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Czech Republic
+</td>
+<td style="text-align:right;">
+10228744
+</td>
+<td style="text-align:right;">
+76.486
+</td>
+<td style="text-align:right;">
+22833.309
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Albania
+</td>
+<td style="text-align:right;">
+3600523
+</td>
+<td style="text-align:right;">
+76.423
+</td>
+<td style="text-align:right;">
+5937.030
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Croatia
+</td>
+<td style="text-align:right;">
+4493312
+</td>
+<td style="text-align:right;">
+75.748
+</td>
+<td style="text-align:right;">
+14619.223
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Poland
+</td>
+<td style="text-align:right;">
+38518241
+</td>
+<td style="text-align:right;">
+75.563
+</td>
+<td style="text-align:right;">
+15389.925
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bosnia and Herzegovina
+</td>
+<td style="text-align:right;">
+4552198
+</td>
+<td style="text-align:right;">
+74.852
+</td>
+<td style="text-align:right;">
+7446.299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Slovak Republic
+</td>
+<td style="text-align:right;">
+5447502
+</td>
+<td style="text-align:right;">
+74.663
+</td>
+<td style="text-align:right;">
+18678.314
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Montenegro
+</td>
+<td style="text-align:right;">
+684736
+</td>
+<td style="text-align:right;">
+74.543
+</td>
+<td style="text-align:right;">
+9253.896
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Serbia
+</td>
+<td style="text-align:right;">
+10150265
+</td>
+<td style="text-align:right;">
+74.002
+</td>
+<td style="text-align:right;">
+9786.535
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hungary
+</td>
+<td style="text-align:right;">
+9956108
+</td>
+<td style="text-align:right;">
+73.338
+</td>
+<td style="text-align:right;">
+18008.944
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Bulgaria
+</td>
+<td style="text-align:right;">
+7322858
+</td>
+<td style="text-align:right;">
+73.005
+</td>
+<td style="text-align:right;">
+10680.793
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Romania
+</td>
+<td style="text-align:right;">
+22276056
+</td>
+<td style="text-align:right;">
+72.476
+</td>
+<td style="text-align:right;">
+10808.476
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Turkey
+</td>
+<td style="text-align:right;">
+71158647
+</td>
+<td style="text-align:right;">
+71.777
+</td>
+<td style="text-align:right;">
+8458.276
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A better way to display this table is with pagination as follows:</p>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Country"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Population Size"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["Life Expectancy"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["GDP"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Iceland","2":"301931","3":"81.757","4":"36180.789"},{"1":"Switzerland","2":"7554661","3":"81.701","4":"37506.419"},{"1":"Spain","2":"40448191","3":"80.941","4":"28821.064"},{"1":"Sweden","2":"9031088","3":"80.884","4":"33859.748"},{"1":"France","2":"61083916","3":"80.657","4":"30470.017"},{"1":"Italy","2":"58147733","3":"80.546","4":"28569.720"},{"1":"Norway","2":"4627926","3":"80.196","4":"49357.190"},{"1":"Austria","2":"8199783","3":"79.829","4":"36126.493"},{"1":"Netherlands","2":"16570613","3":"79.762","4":"36797.933"},{"1":"Greece","2":"10706290","3":"79.483","4":"27538.412"},{"1":"Belgium","2":"10392226","3":"79.441","4":"33692.605"},{"1":"United Kingdom","2":"60776238","3":"79.425","4":"33203.261"},{"1":"Germany","2":"82400996","3":"79.406","4":"32170.374"},{"1":"Finland","2":"5238460","3":"79.313","4":"33207.084"},{"1":"Ireland","2":"4109086","3":"78.885","4":"40675.996"},{"1":"Denmark","2":"5468120","3":"78.332","4":"35278.419"},{"1":"Portugal","2":"10642836","3":"78.098","4":"20509.648"},{"1":"Slovenia","2":"2009245","3":"77.926","4":"25768.258"},{"1":"Czech Republic","2":"10228744","3":"76.486","4":"22833.309"},{"1":"Albania","2":"3600523","3":"76.423","4":"5937.030"},{"1":"Croatia","2":"4493312","3":"75.748","4":"14619.223"},{"1":"Poland","2":"38518241","3":"75.563","4":"15389.925"},{"1":"Bosnia and Herzegovina","2":"4552198","3":"74.852","4":"7446.299"},{"1":"Slovak Republic","2":"5447502","3":"74.663","4":"18678.314"},{"1":"Montenegro","2":"684736","3":"74.543","4":"9253.896"},{"1":"Serbia","2":"10150265","3":"74.002","4":"9786.535"},{"1":"Hungary","2":"9956108","3":"73.338","4":"18008.944"},{"1":"Bulgaria","2":"7322858","3":"73.005","4":"10680.793"},{"1":"Romania","2":"22276056","3":"72.476","4":"10808.476"},{"1":"Turkey","2":"71158647","3":"71.777","4":"8458.276"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Next, the life expectacy in Europe is observed across different years. The aim of this is to check if there was a change in life expectancy over the years. The data used for the life expectancy over the years analysis is the gapminder data and the following data manipulation was performed:</p>
+<pre class="r"><code>#keep on European data and change year to factor
+euro_data_fig &lt;- pop_data %&gt;% 
+                    filter(continent == &quot;Europe&quot;)  %&gt;% 
+                    mutate(year=as.factor(year))</code></pre>
+<p>The life expactency over the years is plotted as following:</p>
+<pre class="r"><code>euro_data_fig %&gt;%
+  ggplot(mapping=aes(x=year, y=lifeExp)) +
+    geom_violin()</code></pre>
+<div class="figure">
+<img src="RNotebookExample_files/figure-html/fig-chunk-1.png" alt="Life Expectancy in Europe over the years" width="672" />
+<p class="caption">
+Life Expectancy in Europe over the years
+</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
