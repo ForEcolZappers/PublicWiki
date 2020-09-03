@@ -1,0 +1,524 @@
+---
+title: "Tidyverse II"
+author: "Sam Woodman"
+date: "10/08/2020"
+output: 
+  html_document:
+    standalone: true
+    toc: true
+    toc_depth: 2
+    toc_float: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+# set global option to not show code blocks when document is knit
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Packages 
+
+The following packages are necessary for this tutorial. Please note the versions of the installed packaged used to create this tutorial. If your packages differ from these then there may be differences. 
+```{r}
+# install packages if they are not already present 
+# if they are the packages in the list are loaded
+packages <- c("tidyverse","broom","tictoc", "gapminder", "patchwork", "modelr")
+
+## Now load or install&load all
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
+
+as.data.frame(installed.packages()[,c(1,3:4)]) %>% 
+  filter(Package %in% packages)
+```
+
+# Introduction
+
+This tutorial is a continuation of the Tidyverse I tutorial given by James Ball on July 28-07-2020 and is a general introduction to functional programming through the tidyverse. We will be primarily exploring the *purrr* and *tidyr* packages, both of which are included when you load the *tidyverse*. Note that this is only an introduction. For more please check [Advanced R](https://adv-r.hadley.nz) and [R for Data Science](https://r4ds.had.co.nz). In many cases there are base R versions almost all tidyverse functions. The strength of the Tidyverse is that all the packages are designed to work together seamlessly. 
+
+# The *purrr* package 
+
+*purrr* is a toolkit for functional programming using functions, vectors, and lists. *purrr* can be used for splitting data into pieces and applying functions to those pieces. A cheatsheet of various *purrr* functions can be found [here](https://github.com/rstudio/cheatsheets/blob/master/purrr.pdf)
+
+## Working with lists
+
+The simplest introduction to *purrr* is to work with simple lists. Below are a series of examples of ways you can use *purrr* to interact with lists. I have only highlighted a few functions below. For more I recommend checking out the cheatsheet linked above. 
+
+```{r list_1_example}
+list.1 <- replicate(5, sample(1:100,size=10), simplify=FALSE) # create 5 lists of random numbers from 1 to 100
+
+list.1
+
+list.1 %>% 
+  pluck(2) # select an element by name or index. equivalent to list.1[[2]]
+
+list.1 %>% 
+  keep(~ sum(.x) > 450) # select elements taht pass a logical test
+
+list.1 %>% 
+  discard(~ sum(.x) > 450) # discard elements that pass a logical test
+
+list.1 %>% 
+  flatten() # remove a level of indexing from a list
+```
+
+These functions can equally be applied to more complex lists. **list.2** below is a multi-level list but can still be manipulated using *purrr* 
+
+```{r list_2_example}
+list.2 <- rerun(5, x = runif(1), y = runif(5)) # create random list where each element has two internal elements, x and y
+
+list.2
+
+list.2 %>% 
+  pluck(2,2) # select an element within a list of lists. equivalent to list.2[[2]][[2]]
+
+list.2 %>% 
+  transpose() # transpose the index order in multi-level lists
+
+list.2 %>% 
+  flatten() %>% # flatten to rermove multilevel
+  keep(~ sum(.x) >2) # keep only elements that has a sum greater than 2
+```
+
+
+## The *map* function
+
+*map* is the backbone of the *purrr* package. It applies a function to each element of a list and returns a vector. This may sound familiar because it is identical to *lapply*. The figure below from [Advacned R](https://adv-r.hadley.nz/functionals.html#map-variants) illustrates how the *map* function works.  Below we use *map* to calculate values from the vectors stored in **list.1**.  
+
+```{r Fig 1, echo=FALSE, fig.cap="Illustration of how map works from Advanced R by Hadley Wickham", out.width = '100%', fig.align="center"}
+knitr::include_graphics("/Users/sam/Downloads/map.png")
+```
+Run each of the examples below before attempting a different function (i.e. replace YOUR_FUNCTION_HERE and uncomment). Try any function that you woud typically use on a numerical vector. 
+
+```{r map_intro}
+list.1 %>% 
+  map(sum) # apply sum across each list
+
+list.1 %>% 
+  map(mean) # calculate mean of each list
+
+list.1 %>% 
+  map(sd) # calculate standard deviation of each list
+
+# l.1 %>% 
+#   map(YOUR_FUNCTION_HERE)
+```
+
+*map* is not limited to just existing functions. you can also write your own functions. Below are two examples of how to apply the same function to **list.1**. The first example writes the function separately before calling it in *map*. The second example use the **~** as a shortcut for writing a function within *map*. Both are valid and depend on your preference. However, I recommend only using the **~** when the function you are writing is simple.
+
+```{r map_write_fun}
+cv_fun <- function(x) {
+  s <- sd(x)
+  m <- mean(x)
+  out <- s/m
+  out
+}
+
+list.1 %>% 
+  map(cv_fun) # apply cv_fun to each list
+
+list.1 %>% 
+  map(~ sd(.)/mean(.)) # shorthand method of applying cv_fun to list
+
+```
+
+
+### Speed test
+*map* is technically slower than *lapply* but it's strength comes from it's helper functions. Below is a speed test to compare the same function applied to the same list using both *lapply* and *map*. Try running this code chunk a few time and compare the times. 
+```{r}
+list.3 <- replicate(10000, sample(1:100,size=20), simplify=FALSE) # create random list 10000 elements long
+
+tic("lappy") # start measuring time to run, label "lapply" in output
+l <- lapply(list.3, mean)
+toc() # stop measuring time to run
+
+tic("map")
+m <-map(list.3,mean)
+toc()
+```
+
+You might not have seen much of a difference between the two. This is likely because the list was only 10000 elements long, each made up of a vector of length 20. If both these values were bigger the difference might become more obvious. You are welcome to try for yourself, I just made the list shorter to save time. 
+
+If you want speedy dataframe manipulation the *tidyverse* may not be best. The tidyverse is more about readability and consistent approach to data Try *[data.table](https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html)* for more efficient dataframe manipulation. 
+
+### Exercise
+
+Using the *map* function determine the number of values above 50 in the ex_list below. 
+
+Hint: you might want to write your own function.
+```{r exercise}
+ex_list <- list(runif(25, 0, 100),
+                  runif(25, 0, 100),
+                  runif(25, 0, 100),
+                  runif(25, 0, 100))
+
+filt_fun <- function(x) x[x >= 50]
+
+ex_list %>% 
+  map(filt_fun) %>% 
+  map(length)
+
+```
+
+
+### Helper functions
+
+As mentioned above *map* comes with several variations that help coerce your output to a desired output. If you know the data type of your output it can save you a step to use the variation of *map* that applies.  
+
+You'll also notice that *map* is working perfectly across all the columns when used with the dataframe **mtcars**. This is because the dataframe only contains numeric columns. If we added a column of a different type it would result in an error. 
+
+```{r map_varaitions}
+data(mtcars)
+
+head(mtcars)
+
+mtcars %>% 
+  map(typeof) # return data type of each column
+
+mtcars %>% 
+  map(mean) # calculate the mean of each column
+
+mtcars %>% 
+  map(mean) %>% # calculate the mean of each column
+  bind_cols() # bind elements
+
+# map_chr() always returns a character vector
+mtcars %>% 
+  map_chr(typeof)
+
+# map_lgl() always returns a logical vector
+mtcars %>% 
+  map_lgl(is.double)
+
+# map_int() always returns a integer vector
+mtcars %>% 
+  map_int(~ length(unique(.)))
+
+# map_dbl() always returns a double vector
+mtcars %>% 
+  map_dbl(mean) 
+
+```
+
+Each of the *map* variations returned a cleaner output than just using *map*. In these cases the implementation was simple but can be more useful when using map within a nested dataframe (see later section). 
+
+### Multiple Arguements: *map2* and *pmap*
+
+Hopefully by now you understand how *map* can be used with lists and that it is a useful function. However, map only works when one list if supplied. Fucntions that require more than one argument need to to use *map2* or the *pmap* functions. Below, is an example if why these are needed and how to implement them. 
+
+#### *map2*
+
+```{r map2_example_data}
+xs <- map(1:8, ~ runif(10)) # create random list
+xs[[1]][[1]] <- NA #replace first value in list 1 with NA
+ws <- map(1:8, ~ rpois(10, 5) + 1) # create list of weights from random poisson distribution
+```
+
+We will try to use *map* to calculate the weighted mean of each element in **xs**. Knowing the *weighted.mean* requires two arguments it would be correct that we will likely get an error. 
+
+```{r weighted_mean_error, error = TRUE}
+xs %>% 
+  map_dbl(mean) # can calculate the mean of each list
+
+xs %>% 
+  map_dbl(mean, na.rm = T) # can calculate the mean of each list while ignoring NAs
+
+xs %>%
+  map_dbl(weighted.mean, w = ws) # cannot calculate the weighted mean
+```
+
+*map* works perfectly well when including *na.rm = T* since this is a singular argument. The problem is that the *map* function does not know how to handle the weight argument (i.e. w = ws). This ca be fixed by using *map2* which, as the name suggests, is the same as *map* but for two arguments.  
+
+```{r map2_example}
+xs %>% 
+  map2(., ws, weighted.mean) # using map2 you can use a second list of the same length for what a function needs two arguments. Note, the . is a placeholder for the object before the pipe
+
+
+xs %>% 
+  map2_dbl(., ws, weighted.mean) # map2 can still benefit from helper functions
+
+xs %>% 
+  map2_dbl(., ws, weighted.mean, na.rm = T) # additional arguments like na.rm can be included in the map family
+```
+
+*map2* works just as you would expect, both xs and ws are used to calculate the weighted mean. Similarly, *map2_dbl* worked the same as *map_dbl*. These variations are consistent across *map*, *map2*, and *pmap*. The figure below from [Advacned R](https://adv-r.hadley.nz/functionals.html#map-variants) illustrates how the *map* function works. Also note that you can still include arguments like *na.rm = T* with *map2*
+
+```{r Fig 2, echo=FALSE, fig.cap="Illustration of how map2 works from Advanced R by Hadley Wickham", out.width = '100%', fig.align="center"}
+knitr::include_graphics("/Users/sam/Downloads/map2.png")
+```
+
+
+#### *pmap*
+
+*pmap* works exactly like *map2* but for more that two arguments. The key difference is that the list of arguments need to be within *list()*.  The figure below from [Advacned R](https://adv-r.hadley.nz/functionals.html#map-variants) illustrates how the *pmap* function works. 
+
+```{r Fig 3, echo=FALSE, fig.cap="Illustration of how pmap works from Advanced R by Hadley Wickham", out.width = '100%', fig.align="center"}
+knitr::include_graphics("/Users/sam/Downloads/pmap.png")
+```
+```{r pmap_example_1}
+n <- list(1, 2, 3)
+min <- list(0, 10, 100)
+max <- list(1, 100, 1000)
+
+pmap(list(n, min, max), runif) # use list in pmap to list all the arguments
+
+```
+
+You might have noticed that across all these examples the length of each list used in *map2* and *pmap* were the same length. If they are different length you will get an error (see below). 
+
+```{r pmap_list_length, error= T}
+n <- list(1, 2, 3)
+min <- list(0, 10, 100)
+max <- list(1, 100, 1000, 10000)
+
+pmap(list(n, min, max), runif) # all lists must be the same length
+```
+
+## The *walk* function
+In addition to *map* and it's varieties there is *walk*. The *walk* function works exactly like *map* including the *walk2* and *pwalk*. The difference is that *walk* is used when you want to call the side effects of a function (i.e. write_csv, ggsave). Typically, I will use this when a function manipulates a list and I want to save each element individually. For example this is great for saving vector layers of an sf object as their own spatial file.
+
+```{r error = T}
+rerun(3, x = rnorm(100), y = rnorm(100)) %>% # create 5 lists of random numbers
+    map(~ data.frame(.x)) %>% # convert each list to a df
+    walk(function(df) {
+        p <- ggplot(df, aes(x = x, y = y)) + geom_point() # apply the walk function to produce plat
+        p 
+    })
+
+rerun(3, x = rnorm(100), y = rnorm(100)) %>% # create 5 lists of random numbers
+    map(~ data.frame(.x)) %>% # convert each list to a df
+    walk(function(df) {
+        p <- ggplot(df, aes(x = x, y = y)) + geom_point() # apply the walk function to produce plat
+        print(p) # walk function results in the plots stored in p being printed
+    })
+```
+
+
+## Error proof your fucntions...kind of
+
+As illustrated in a few examples above, when *map* encounters an error is stops running and gives you that error. This is good for knowing something went wrong but disappointing if the error was in element 60000 of a vector. You lose all the previously successful runs of *map* on the previous elements and have to fix the error and start over. 
+
+Thankfully, there is the *safely* function. *safely* is a wrapper for other functions that changes how the output is produced. For each element you are applying a function to with *map*, *safely* outputs a multi-level list where each element has */$results* and */$error*. Result stores the successful runs of your function and error stores any error messages. From this output you can see where your function did not run while keeping the successful runs. After fixing your function you can rerun it on only those that had an error and save substantial processing time. Below is an example of this. 
+
+
+```{r safely_example, error = T}
+list.4 <- list(a = runif(10, 0, 100),
+            b = rep("a", 10),
+            c = runif(10, 0, 100),
+            d = runif(10, 0, 100),
+            e = runif(10, 0, 100)
+            )
+
+list.4 %>% 
+  map(log) # error due to "a" in list
+
+list.4 %>% 
+  map(safely(log)) # wrap the log function in the safely function to store errors and results
+
+
+list.4_error <- list.4 %>% 
+  map(safely(log)) %>% 
+  map("error") # shortcut to extract element based on "name"
+list.4_error
+
+list.4_result <- list.4 %>% 
+  map(safely(log)) %>% 
+  map("result") %>% # shortcut to extract element based on "name"
+  compact()
+list.4_result
+
+
+```
+The vector with an "a" obviously produced an error when attempting to log. However, if you didn't know there was an issue there you could easily fix it now and only rerun that vector. 
+
+
+# *tidyr*: Nested Dataframes
+
+This section focuses on how to use *map* when working with dataframes. To do this we need to use the *tidyr* package. Specifically, the *nest* function which creates a list column in a dataframe. You can treat this list column exactly like you would a traditional list with a little help from dplyr. 
+
+**Note** the examples below were taken directly from the [Many Models](https://r4ds.had.co.nz/many-models.html) chapter of R for Data Science.
+
+We will be using the **gapminder** data set of life expectancy, population, and GDP for countries across the world. Based on the figure below you can see that there is a general increase in life expectancy across the world with a few major dips. Using *tidyr*, *map*, and the *broom* package we will model this relationship all within a dataframe. 
+
+```{r gapminder_intro}
+gapminder
+
+gapminder %>% 
+  ggplot(aes(year, lifeExp, group = country)) +
+    geom_line(alpha = 1/3)
+```
+
+We can use the **gapminder** dataset to investigate the pattern of life expectancy over time for a singular country. 
+
+```{r}
+ca <- filter(gapminder, country == "Canada")
+full_plot <- ca %>% 
+  ggplot(aes(year, lifeExp)) + 
+  geom_line() + 
+  ggtitle("Full data = ")
+
+ca_mod <- lm(lifeExp ~ year, data = ca)
+lin_plot <- ca %>% 
+  modelr::add_predictions(ca_mod) %>%
+  ggplot(aes(year, pred)) + 
+  geom_line() + 
+  ggtitle("Linear trend + ")
+
+res_plot <- ca %>% 
+  modelr::add_residuals(ca_mod) %>% 
+  ggplot(aes(year, resid)) + 
+  geom_hline(yintercept = 0, colour = "white", size = 3) + 
+  geom_line() +
+  ggtitle("Remaining pattern")
+
+
+full_plot + lin_plot + res_plot
+
+```
+
+This is useful but impractical to run individually for all `r gapminder %>% pull(country) %>% unique() %>% length()` countries in the dataset. This is when *nest* from *tidyr* comes in handy. As mentioned, *nest* creates a list-column in the dataframe according to the defined grouping factor. In other words, anything not in the grouping factor is stored in a single **data** column. 
+
+```{r}
+by_country <- gapminder %>% 
+  group_by(country, continent) %>% # chose grouping factor
+  nest() # nest according to the grouping
+
+by_country 
+
+by_country$data[[1]] # select the first element in the column just like you would for a list
+
+by_country %>% 
+  unnest(data) # unnest the data to return to its original configuation. 
+```
+Now that you have nested the dataframe you can apply a model to each row. By creating a model function you can use it with *map* exactly like you did with any other function. Importantly, you need to remember that you are working in a dataframe so you need to use *dplyr::mutate* to create a new column with the model output. 
+
+```{r country_model}
+country_model <- function(df) {
+  lm(lifeExp ~ year, data = df)
+}
+
+by_country_model <- by_country %>% 
+  mutate(model = map(data, country_model))
+
+by_country_model
+
+by_country_model$model[[1]] # select the first element to see the result
+```
+
+Since you are still working with a dataframe all the *tidyverse*/dataframe functions still work. The nested model output will be carried though. 
+
+```{r}
+by_country_model %>% 
+  filter(continent == "Europe") # filter to only countries in Europe
+
+by_country_model %>% 
+  arrange(country) # arrange alphabetically by country
+```
+You can also use the *model* column for any function that requires a model output as an input. Here, *add_residual* from *modelr* is used to add the residuals to the dataframe. 
+
+```{r}
+by_country_resid <- by_country_model %>% 
+  mutate(
+    resids = map2(data, model, modelr::add_residuals) # add the residuals for each model
+  )
+
+resids_df <- by_country_resid %>% 
+  unnest(cols = resids) # unnest the residual column only
+```
+Once unnested the dataframe expands and fills in the rows as needed. Any column that is not specified in *unnest* will remain nested. 
+
+Again because you are working with a dataframe you can easily plot with ggplot. Below is a plot of the newly calculated residuals across years and the residuals grouped by continent
+
+```{r resid_year_fig}
+resids_df %>% 
+  ggplot(aes(x = year, y = resid)) +
+    geom_line(aes(group = country), alpha = 1 / 3) + 
+    geom_smooth(se = FALSE)
+```
+
+```{r resid_year_facet_plot}
+resids_df %>% 
+  ggplot(aes(x = year, y = resid, group = country)) +
+    geom_line(alpha = 1 / 3) + 
+    facet_wrap(~continent)
+```
+
+## Tidier models with *broom*
+
+The above example of calculating residuals is a good introduction but would be limiting if you were interested in more information from the model. You may think that you could simply *unnest* the *model* column to access all the information stored there but unfortunately that produces an error
+
+```{r error = T}
+by_country_model %>% 
+  unnest(model)
+```
+
+Thankfully this is why the *broom* package was created. *broom* converts model outputs to a tidy format so they can be used in dataframes. There are three functions that make up the core fucntion of *broom*.
+
+- tidy: returns a row for each coefficient in the model. Each column gives information about the estimate or its variability.
+- glance: returns a row for each model. Each column gives a model summary: either a measure of model quality, or complexity, or a combination of the two.
+- augment: returns a row for each row in data, adding extra values like residuals, and influence statistics.
+
+By using each of these you can extract all the necessary information from a model. Also, *broom* does not only work with *lm* it is also compatible with glm, nls, gam, mixed models, correlation, to name a few. 
+
+Below is an example of how to use tidy, glance, and augment from the *broom* package. 
+
+```{r}
+by_country <- gapminder %>% 
+  group_by(country, continent) %>% #grouping factor
+  nest()
+```
+
+```{r}
+country_model_tidy <- function(df) {
+  lm(lifeExp ~ year, data = df) # fit a lm 
+}
+
+by_country_tidy_mod <- by_country %>% 
+  mutate(model = map(data, country_model), # apply lm to each nested df
+         tidy_model = map(model, tidy),  # tidy the model output
+         glance_model = map(model, glance), # apply glance to the model column
+         augment_model = map(model, augment)) # apply augment to the model column
+
+by_country_tidy_mod %>% 
+  unnest(tidy_model)
+
+by_country_tidy_mod %>% 
+  unnest(glance_model)
+
+by_country_tidy_mod %>% 
+  unnest(augment_model)
+```
+
+```{r}
+by_country_tidy_mod %>% 
+  unnest(tidy_model) %>% 
+  filter(term != "(Intercept)") %>% # remove the intercept from the dataframe
+  filter(p.value <= 0.5) # select only significant values
+
+by_country_tidy_mod %>% 
+  unnest(tidy_model) %>% 
+  filter(term != "(Intercept)") %>% 
+  filter(p.value <= 0.5) %>% 
+  unnest(augment_model, .drop = T) %>% #unnest the augment column and drop and duplicate columns
+  filter(continent == "Europe") # filter to only Europe
+
+by_country_tidy_mod %>% 
+  unnest(tidy_model) %>% 
+  filter(term != "(Intercept)") %>% 
+  filter(p.value <= 0.5) %>% 
+  unnest(augment_model, .drop = T) %>% 
+  filter(continent == "Europe")%>% 
+  ggplot(aes(x = .fitted, y = .resid, fill = country)) +
+  geom_point() +
+  facet_wrap(~country, scales = "free") +
+  theme(legend.position = "none")
+```
+
