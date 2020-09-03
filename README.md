@@ -4,7 +4,7 @@ https://docs.google.com/document/d/1xk61EK3eyOAcplCuKVRDbj9dk52awN1hFaP1yzGRXc0/
 
 ## Classes
 
-* **tidyverse II** *11/08/2020* [TO BE COMPLETED BY SAM]
+* **tidyverse II** *11/08/2020* Builds upon tidyverse intro with a focus on the purrr and tidy packages. 
 * **tidyverse intro** *28/07/2020* The tidyverse is a collection of R packages designed to make data analysis easier, cleaner and more efficient [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/tidyverse_class)
 * **Linux/Bash** *20/07/2020* Bash and cluster computing can be invaluable for processing large amounts of data. Anne Thomas gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/bash_cluster_class) on the topic.
 * **rmarkdown** *23/06/2020* Rmarkdown is a useful tool for producing and publishing reproducable research. O'Neill Tun gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/Rmarkdown_class) on the basics. 
