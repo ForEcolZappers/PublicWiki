@@ -1,0 +1,104 @@
+<VRTDataset rasterXSize="7171" rasterYSize="5391">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform>  1.1434721378053571e+02,  9.4481215591359769e-06,  0.0000000000000000e+00,  2.2441971772614721e+01,  0.0000000000000000e+00, -9.4481215591359769e-06</GeoTransform>
+  <VRTRasterBand dataType="Float32" band="1">
+    <NoDataValue>-9999</NoDataValue>
+    <ColorInterp>Gray</ColorInterp>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_0_0.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_0_2000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="0" yOff="2000" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_0_4000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="1391" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="1391" />
+      <DstRect xOff="0" yOff="4000" xSize="2000" ySize="1391" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_2000_0.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="2000" yOff="0" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_2000_2000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="2000" yOff="2000" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_2000_4000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="1391" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="1391" />
+      <DstRect xOff="2000" yOff="4000" xSize="2000" ySize="1391" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_4000_0.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="4000" yOff="0" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_4000_2000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="2000" />
+      <DstRect xOff="4000" yOff="2000" xSize="2000" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_4000_4000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2000" RasterYSize="1391" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="2000" ySize="1391" />
+      <DstRect xOff="4000" yOff="4000" xSize="2000" ySize="1391" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_6000_0.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1171" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1171" ySize="2000" />
+      <DstRect xOff="6000" yOff="0" xSize="1171" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_6000_2000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1171" RasterYSize="2000" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1171" ySize="2000" />
+      <DstRect xOff="6000" yOff="2000" xSize="1171" ySize="2000" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+    <ComplexSource>
+      <SourceFilename relativeToVRT="0">E:\PhD_project\GDAL_presentation\DTM_tiles\DTM_6000_4000.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="1171" RasterYSize="1391" DataType="Float32" BlockXSize="256" BlockYSize="256" />
+      <SrcRect xOff="0" yOff="0" xSize="1171" ySize="1391" />
+      <DstRect xOff="6000" yOff="4000" xSize="1171" ySize="1391" />
+      <NODATA>-9999</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>
