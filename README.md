@@ -3,7 +3,7 @@
 https://docs.google.com/document/d/1xk61EK3eyOAcplCuKVRDbj9dk52awN1hFaP1yzGRXc0/edit#
 
 ## Classes
-
+* **Docker** *22/09/2020* Docker is great for creating portable and consistent computational environments. In this [session](https://github.com/ForEcolZappers/PublicWiki/tree/master/Docker_intro), Alex Guizar gave a short introduction on the basics of Docker and how it can be used to support scientific research and reproducibility.
 * **tidyverse II** *11/08/2020* Builds upon tidyverse intro with a focus on the purrr and tidy packages. 
 * **tidyverse intro** *28/07/2020* The tidyverse is a collection of R packages designed to make data analysis easier, cleaner and more efficient [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/tidyverse_class)
 * **Linux/Bash** *20/07/2020* Bash and cluster computing can be invaluable for processing large amounts of data. Anne Thomas gave a [short class](https://github.com/ForEcolZappers/PublicWiki/tree/master/bash_cluster_class) on the topic.
