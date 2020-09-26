@@ -1,0 +1,9 @@
+.DS_Store
+.Rproj.user
+.Rhistory
+.RData
+.Rapp.history
+.ipynb_checkpoints
+.httr-oauth
+.env
+__pycache__
