@@ -25,8 +25,11 @@
 #5.3 make_dem
 #5.4 thin_laz_highest
 
-
-#1
+getmode <- function(v) {
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+#1 Create tiles ###############
 create_small_tiles=function(df,large_tiles_folder,tile_size,buffer_size){
   # This function resamples the original point cloud to smaller tiles with buffers
   # This helps with storage and processing and consistency across sites.
@@ -68,7 +71,7 @@ create_small_tiles=function(df,large_tiles_folder,tile_size,buffer_size){
 }
 
 #2.1
-make_dsm_full=function(df,tin_resolution,subcircle){
+make_dsm_full=function(df,subcircle){
  
   thin_path=file.path(df$base_path, "DSM_small_tiles/thin_highest"); dir.create(thin_path)
   DSM_folder=paste0(df$base_path,"DSM/"); dir.create(DSM_folder)
@@ -83,6 +86,44 @@ make_dsm_full=function(df,tin_resolution,subcircle){
     out_path = DSM_raster_path,
     bbtype = df$bbtype, # bbtype not applicable because using tiles not made with lastools... i think
     LAStools_path = df$LAStools_path)
+  
+}
+
+make_random_dsm_full=function(df,subcircle,num_chunks){
+  
+  thin_path=file.path(df$base_path, "DSM_small_tiles/thin_random"); dir.create(thin_path)
+  DSM_folder=paste0(df$base_path,"DSM/"); dir.create(DSM_folder)
+  DSM_raster_path=paste0(df$base_path,"DSM/random_sub_",subcircle,"_",df$raster_resolution,"m/"); dir.create(DSM_raster_path)
+  
+  
+  # Thin the highest points in a laz file
+  system(paste(
+    file.path(df$LAStools_path, "lasthin"),
+    "-i",
+    paste0(df$base_path,"DSM_small_tiles/",df$file_type),
+    paste("-step", df$raster_resolution),
+    paste("-subcircle", subcircle),
+    "-first_only -random",
+    "-odir", thin_path,
+    "-olaz"
+  ))
+  
+  make_dem(
+    input_file_pattern = file.path(thin_path, "*.laz"),
+    step = df$raster_resolution,
+    out_path = DSM_raster_path,
+    bbtype = df$bbtype, 
+    LAStools_path = df$LAStools_path)
+  
+  mosaic_rasters2(raster_input_path=DSM_raster_path,
+                  raster_output_path=df$base_path,
+                  raster_resolution=df$raster_resolution,
+                  raster_output_name=paste0(df$raster_output_name,"_DSM_random_sub_",subcircle,"_",df$raster_resolution,"m"),
+                  num_chunks=num_chunks,
+                  epsg_code=df$epsg_code)
+  
+  DSM=raster(paste0(df$base_path,df$raster_output_name,"_DSM_random_sub_",subcircle,"_",df$raster_resolution,"m.tif"))
+  return(DSM)
   
 }
 
@@ -116,26 +157,87 @@ mosaic_DSM_DTM_CCCHM=function(df,tin_resolution,subcircle,num_chunks){
   CHM_raster_path=paste0(df$base_path,"CHM/g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m/"); 
   dir.create(paste0(df$base_path,"CHM")); dir.create(CHM_raster_path)
   
-  mosaic_rasters(raster_path=DSM_raster_path,
+  mosaic_rasters2(raster_input_path=DSM_raster_path,
+                 raster_output_path=df$base_path,
                  raster_resolution=df$raster_resolution,
                  raster_output_name=paste0(df$raster_output_name,"_DSM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m"),
                  num_chunks=num_chunks,
                  epsg_code=df$epsg_code)
   
-  mosaic_rasters(raster_path=DTM_raster_path,
+  mosaic_rasters2(raster_input_path=DTM_raster_path,
+                 raster_output_path=df$base_path,
                  raster_resolution=df$raster_resolution,
                  raster_output_name=paste0(df$raster_output_name,"_DTM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m"),
                  num_chunks=num_chunks,
                  epsg_code=df$epsg_code)
   
-  DSM=raster(paste0(DSM_raster_path,df$raster_output_name,"_DSM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
-  DTM=raster(paste0(DTM_raster_path,df$raster_output_name,"_DTM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
+  DSM=raster(paste0(df$base_path,df$raster_output_name,"_DSM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
+  DTM=raster(paste0(df$base_path,df$raster_output_name,"_DTM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
   CCCHM=DSM-DTM
-  writeRaster(CCCHM, filename=paste0(df$base_path,"CHM/",df$raster_output_name,"_CCCHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"), format="GTiff")
+  writeRaster(CCCHM, filename=paste0(df$base_path,df$raster_output_name,"_CCCHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"), format="GTiff")
   
   return(CCCHM)
 }
 
+#2.4
+make_pulse_density_raster_full=function(df,num_chunks){
+  
+  pulse_density_raster_path=paste0(df$base_path,"DSM_small_tiles/pd_",df$raster_resolution,"m/"); 
+  dir.create(pulse_density_raster_path)
+  
+  system(paste(
+    file.path(df$LAStools_path, "lasgrid"),
+    "-i",
+    file.path(paste0(df$base_path,"DSM_small_tiles/", "*.laz")),
+    "-keep_first", 
+    paste("-step", df$raster_resolution),
+    "-point_density",
+    paste("-use_", df$bbtype, "_bb", sep = ""),
+    paste("-odir", pulse_density_raster_path),
+    paste("-epsg", df$epsg_code),
+    paste("-cores", df$n_cores),
+    "-otif"
+  ))
+  
+  mosaic_rasters2(raster_input_path=pulse_density_raster_path,
+                  raster_output_path=df$base_path,
+                  raster_resolution=df$raster_resolution,
+                  raster_output_name=paste0(df$raster_output_name,"_pd_",df$raster_resolution,"m"),
+                  num_chunks=num_chunks,
+                  epsg_code=df$epsg_code)
+  
+}
+
+#2.4
+make_point_density_raster_full=function(df,num_chunks){
+  
+  point_density_raster_path=paste0(df$base_path,"DSM_small_tiles/ptd_",df$raster_resolution,"m/"); 
+  dir.create(point_density_raster_path)
+  
+  system(paste(
+    file.path(df$LAStools_path, "lasgrid"),
+    "-i",
+    file.path(paste0(df$base_path,"DSM_small_tiles/", "*.laz")),
+    #"-keep_first", 
+    paste("-drop_classification 2"),
+    paste("-step", df$raster_resolution),
+    "-point_density",
+    paste("-use_", df$bbtype, "_bb", sep = ""),
+    paste("-odir", point_density_raster_path),
+    paste("-epsg", df$epsg_code),
+    paste("-cores", df$n_cores),
+    "-otif"
+  ))
+  
+  mosaic_rasters2(raster_input_path=point_density_raster_path,
+                  raster_output_path=df$base_path,
+                  raster_resolution=df$raster_resolution,
+                  raster_output_name=paste0(df$raster_output_name,"_ptd_",df$raster_resolution,"m"),
+                  num_chunks=num_chunks,
+                  epsg_code=df$epsg_code)
+  
+}
+# check vertical allignmetd DTM-DTM
 ################
 
 
@@ -203,10 +305,10 @@ make_pitfree_chm_tiled_rasters=function(df,tin_resolution,subcircle,h_seq){
   tmp_chm_path=paste0(CHM_raster_path, "tmp_chm"); #dir.create(tmp_chm_path)
   
   chm_tiles_files=list.files(chm_path,full.names = TRUE, pattern = ".laz$")
-  #cl <- makeCluster(4)
-  #registerDoParallel(cl)
-  #foreach(i = chm_tiles_files,.packages = c("raster"),.inorder = TRUE) %dopar% {
-  for (i in chm_tiles_files) {
+  cl <- makeCluster(4)
+  registerDoParallel(cl)
+  foreach(i = chm_tiles_files,.packages = c("raster"),.inorder = TRUE) %dopar% {
+  #for (i in chm_tiles_files) {
     print(i)
     #i=chm_tiles_files[1]
     # get the maximum height in the file
@@ -228,16 +330,16 @@ make_pitfree_chm_tiled_rasters=function(df,tin_resolution,subcircle,h_seq){
           paste("-step",df$raster_resolution),
           paste("-kill", 2),
           paste("-use_", df$bbtype, "_bb", sep=""),
+          #paste("-cores", df$n_cores),
           "-o",
           file.path(tmp_chm_path, paste(
             gsub(".laz", "", basename(i)), "_chm_", j, ".bil", sep = ""
-          )), 
-          paste("-cores", df$n_cores)
+          ))
         )
       )
     }
     
-    print(rep('Done with the loop over h_seq',10000))
+    #print(rep('Done with the loop over h_seq',10000))
     # Merge the layers
     print(i)
     system(
@@ -255,11 +357,11 @@ make_pitfree_chm_tiled_rasters=function(df,tin_resolution,subcircle,h_seq){
         paste("-drop_z_below", 0), # drop any points below 0
         paste("-drop_z_above", max(h_seq)), # drop any points above the max height
         # "-use_bb",
+        #paste("-cores", df$n_cores),
         "-o",
         file.path(CHM_raster_path, paste(
           gsub(".laz", "", basename(i)), "_r.tif", sep = ""
-        )), 
-        paste("-cores", df$n_cores)
+        ))
       )
     )
     
@@ -271,12 +373,156 @@ make_pitfree_chm_tiled_rasters=function(df,tin_resolution,subcircle,h_seq){
 mosaic_CHM_rasters=function(df,tin_resolution,subcircle,num_chunks){
   CHM_raster_path=paste0(df$base_path,"CHM/g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m/");
   
-  mosaic_rasters(raster_path=CHM_raster_path,
+  mosaic_rasters2(raster_input_path=CHM_raster_path,
+                 raster_output_path=df$base_path,
                  raster_resolution=df$raster_resolution,
                  raster_output_name=paste0(df$raster_output_name,"_CHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m"),
                  num_chunks=num_chunks,
                  epsg_code=df$epsg_code)
-  CHM=raster(paste0(CHM_raster_path,df$raster_output_name,"_CHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
+  CHM=raster(paste0(df$base_path,df$raster_output_name,"_CHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
+  return(CHM)
+}
+
+make_thin_chm_las_files=function(df,tin_resolution,subcircle,h_seq,pd){
+  chm_path = file.path(df$base_path, "DSM_small_tiles/chm");  # dir.create(chm_path)
+  CHM_folder=paste0(df$base_path,"CHM_thin/"); dir.create(CHM_folder)
+  CHM_raster_path=paste0(df$base_path,"CHM_thin/g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m/"); dir.create(CHM_raster_path)
+  tmp_laz_thin1_path=paste0(CHM_raster_path, "tmp_laz_thin1"); dir.create(tmp_laz_thin1_path)
+  tmp_laz_thin2_path=paste0(CHM_raster_path, "tmp_laz_thin2"); dir.create(tmp_laz_thin2_path)
+  
+  tmp_chm_path=paste0(CHM_raster_path, "tmp_chm_thin"); dir.create(tmp_chm_path)
+
+  
+  # create the tmp chm ground files
+  system(paste(
+    file.path(df$LAStools_path, "blast2dem"),
+    "-i",file.path(chm_path, "*.laz"),
+    paste("-keep_class", 2),
+    paste("-step", df$raster_resolution),
+    #paste("-kill", 40),
+    paste("-use_", df$bbtype, "_bb", sep=""),
+    paste("-odir", tmp_chm_path),
+    paste("-odix", '_chm_ground.bil'),
+    #"-o",
+    #file.path(tmp_chm_path, paste(
+    #  gsub(".laz", "", basename(i)), "_chm_ground.bil", sep = ""
+    #)),
+    paste("-cores", df$n_cores)
+  ))
+  
+  # Thin the laz file to required point density - RANDOM
+  system(paste(
+    file.path(df$LAStools_path, "lasthin"),
+    "-i",file.path(chm_path, "*.laz"),
+    paste("-step",1/pd),
+    "-random",
+    paste("-odir", tmp_laz_thin1_path),
+    paste("-odix", '_chm_thin'),
+    '-olaz',
+    paste("-cores", df$n_cores)
+  ))
+  
+  # Thin the laz file to highest per quarter cell
+  system(paste(
+    file.path(df$LAStools_path, "lasthin"),
+    "-i",file.path(tmp_laz_thin1_path, "*.laz"),
+    paste("-subcircle", subcircle),
+    paste("-step",df$raster_resolution / 4),
+    "-highest",
+    paste("-odir", tmp_laz_thin2_path),
+    paste("-odix", '_chm_thin'),'-olaz',
+    #"-o",
+    #file.path(tmp_laz_path, paste(
+    #  gsub(".laz", "", basename(i)), "_temp.laz", sep = ""
+    #)),
+    paste("-cores", df$n_cores)
+  ))
+  
+}
+
+#3.2
+make_pitfree_thin_chm_tiled_rasters=function(df,tin_resolution,subcircle,h_seq){
+  ground_path=file.path(df$base_path, "DSM_small_tiles/ground"); #dir.create(ground_path)
+  chm_path = file.path(df$base_path, "DSM_small_tiles/chm");   #dir.create(chm_path)
+  CHM_folder=paste0(df$base_path,"CHM_thin/"); #dir.create(CHM_folder)
+  CHM_raster_path=paste0(df$base_path,"CHM_thin/g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m/"); #dir.create(CHM_raster_path)
+  tmp_laz_path=paste0(CHM_raster_path, "tmp_laz_thin2"); #dir.create(tmp_laz_path)
+  tmp_chm_path=paste0(CHM_raster_path, "tmp_chm_thin"); #dir.create(tmp_chm_path)
+  
+  chm_tiles_files=list.files(chm_path,full.names = TRUE, pattern = ".laz$")
+  cl <- makeCluster(4)
+  registerDoParallel(cl)
+  foreach(i = chm_tiles_files,.packages = c("raster"),.inorder = TRUE) %dopar% {
+    #for (i in chm_tiles_files) {
+    print(i)
+    #i=chm_tiles_files[1]
+
+    # Sequentially build the CHM for each layer
+    ## add code to drop green pixels 
+    for (j in h_seq) {
+      print(j)
+      system(
+        paste(
+          file.path(df$LAStools_path, "blast2dem"),
+          "-i",
+          file.path(tmp_laz_path, 
+                    paste(gsub(".laz", "", basename(i)), 
+                          "_chm_thin_chm_thin.laz", sep = "")
+          ),
+          paste("-drop_z_below", j),
+          paste("-step",df$raster_resolution),
+          paste("-kill", 2),
+          paste("-use_", df$bbtype, "_bb", sep=""),
+          #paste("-cores", df$n_cores),
+          "-o",
+          file.path(tmp_chm_path, paste(
+            gsub(".laz", "", basename(i)), "_chm_", j, ".bil", sep = ""
+          ))
+        )
+      )
+    }
+    
+    #print(rep('Done with the loop over h_seq',10000))
+    # Merge the layers
+    print(i)
+    system(
+      paste(
+        file.path(df$LAStools_path, "lasgrid"),
+        "-i",
+        file.path(tmp_chm_path, 
+                  paste(gsub(".laz", "", basename(i)), 
+                        "_chm_*.bil", sep = "")
+        ),
+        "-merged",
+        paste("-step", df$raster_resolution),
+        "-highest",
+        #paste("-set_min_max", -2, max(h_seq)),
+        paste("-drop_z_below", 0), # drop any points below 0
+        paste("-drop_z_above", max(h_seq)), # drop any points above the max height
+        # "-use_bb",
+        #paste("-cores", df$n_cores),
+        "-o",
+        file.path(CHM_raster_path, paste(
+          gsub(".laz", "", basename(i)), "_r.tif", sep = ""
+        ))
+      )
+    )
+    
+  }
+  #stopCluster(cl)
+}
+
+#3.3
+mosaic_thin_CHM_rasters=function(df,tin_resolution,subcircle,num_chunks){
+  CHM_raster_path=paste0(df$base_path,"CHM_thin/g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m/");
+  
+  mosaic_rasters2(raster_input_path=CHM_raster_path,
+                  raster_output_path=df$base_path,
+                  raster_resolution=df$raster_resolution,
+                  raster_output_name=paste0(df$raster_output_name,"_CHM_thin_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m"),
+                  num_chunks=num_chunks,
+                  epsg_code=df$epsg_code)
+  CHM=raster(paste0(df$base_path,df$raster_output_name,"_CHM_g",tin_resolution,"_sub",subcircle,"_",df$raster_resolution,"m.tif"))
   return(CHM)
 }
 
@@ -299,9 +545,9 @@ make_mosaic<-function(files, fun, na.rm, crs, filename){
 }
 
 #4.2
-mosaic_rasters=function(raster_path, raster_resolution, raster_output_name, num_chunks, epsg_code){
-  
-  A<-list.files(raster_path, pattern = ".tif$", full.names = TRUE)
+mosaic_rasters=function(raster_input_path,raster_output_path, raster_resolution, raster_output_name, num_chunks, epsg_code){
+  # This one has raster_output_path but is unused
+  A<-list.files(raster_input_path, pattern = ".tif$", full.names = TRUE)
   
   chunker <- function(x,n) split(x, cut(seq_along(x), n, labels = FALSE)) 
   B<-chunker(A, num_chunks)
@@ -313,23 +559,54 @@ mosaic_rasters=function(raster_path, raster_resolution, raster_output_name, num_
       fun = mean,
       na.rm = TRUE,
       crs = CRS(paste0("+init=EPSG:",epsg_code)),
-      filename = paste(raster_path,raster_output_name,"_", count, ".tif", sep = "")
+      filename = paste(raster_input_path,raster_output_name,"_", count, ".tif", sep = "")
     )
     count<<-count+1
   })
   
   make_mosaic(
-    files = list.files(raster_path, pattern = paste0(raster_resolution,"m_[[:digit:]].tif$"), full.names = TRUE),
+    files = list.files(raster_input_path, pattern = paste0(raster_resolution,"m_[[:digit:]].tif$"), full.names = TRUE),
     fun = mean,
     na.rm = TRUE,
     crs = CRS(paste0("+init=EPSG:",epsg_code)),
-    filename = paste0(raster_path,raster_output_name,".tif")
+    filename = paste0(raster_input_path,raster_output_name,".tif")
   )
-  
   
 }
 
 
+
+#4.3
+mosaic_rasters2=function(raster_input_path,raster_output_path, raster_resolution, raster_output_name, num_chunks, epsg_code){
+  
+  raster_temp_path=paste0(raster_input_path,'temp/')
+  dir.create(raster_temp_path)
+  A<-list.files(raster_input_path, pattern = ".tif$", full.names = TRUE)
+  
+  chunker <- function(x,n) split(x, cut(seq_along(x), n, labels = FALSE)) 
+  B<-chunker(A, num_chunks)
+  #C=B[[1]]
+  count<-1
+  mymosaics <- lapply(B, function(x) {
+    make_mosaic(
+      files = x,
+      fun = mean,
+      na.rm = TRUE,
+      crs = CRS(paste0("+init=EPSG:",epsg_code)),
+      filename = paste(raster_temp_path,raster_output_name,"_", count, ".tif", sep = "")
+    )
+    count<<-count+1
+  })
+  
+  make_mosaic(
+    files = list.files(raster_temp_path, pattern = "*.tif$", full.names = TRUE),
+    fun = mean,
+    na.rm = TRUE,
+    crs = CRS(paste0("+init=EPSG:",epsg_code)),
+    filename = paste0(raster_output_path,raster_output_name,".tif")
+  )
+  
+}
 ######################################## Tools
 #5.1
 classify_ground_points=function(input_file_pattern,  out_path,step, epsg_code, n_cores, LAStools_path){
